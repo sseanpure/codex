@@ -1,11 +1,9 @@
 import os
 import requests
 from bs4 import BeautifulSoup
-from telegram import Bot
-from telegram.ext import Updater, JobQueue
+from telegram.ext import ApplicationBuilder, ContextTypes
 import openai
 import json
-import re
 
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
@@ -13,7 +11,6 @@ CHANNEL_ID = os.environ.get('CHANNEL_ID')  # e.g. '@mychannel'
 
 # Initialize APIs
 openai.api_key = OPENAI_API_KEY
-bot = Bot(token=TELEGRAM_TOKEN)
 
 
 def fetch_morningbrew_article():
@@ -57,28 +54,28 @@ def summarize_and_translate(text):
     return response.choices[0].message['content'].strip()
 
 
-def send_summary(context):
+async def send_summary(context: ContextTypes.DEFAULT_TYPE):
     """Fetch article, summarize, and send to Telegram channel."""
     try:
         article_text = fetch_morningbrew_article()
         summary = summarize_and_translate(article_text)
         if summary:
-            bot.send_message(chat_id=CHANNEL_ID, text=summary)
+            await context.bot.send_message(chat_id=CHANNEL_ID, text=summary)
     except Exception as exc:
         print(f'Error sending summary: {exc}')
 
 
 def main():
-    updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
-    job_queue: JobQueue = updater.job_queue
+    application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
     # Send summary once on startup
-    job_queue.run_once(send_summary, 0)
+    application.job_queue.run_once(send_summary, when=0)
     # Schedule every 24 hours
-    job_queue.run_repeating(send_summary, interval=24*60*60, first=24*60*60)
+    application.job_queue.run_repeating(
+        send_summary, interval=24 * 60 * 60, first=24 * 60 * 60
+    )
 
-    updater.start_polling()
-    updater.idle()
+    application.run_polling()
 
 
 if __name__ == '__main__':

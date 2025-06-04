@@ -6,7 +6,7 @@ This bot fetches the latest article from [morningbrew.com](https://www.morningbr
 
 1. Install dependencies:
    ```bash
-   pip install python-telegram-bot openai requests beautifulsoup4
+   pip install python-telegram-bot==20.7 openai requests beautifulsoup4
    ```
 2. Set the following environment variables:
    - `OPENAI_API_KEY` – your OpenAI API key.
