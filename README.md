@@ -13,6 +13,15 @@ This bot fetches the latest article from [morningbrew.com](https://www.morningbr
    - `TELEGRAM_TOKEN` – token for your Telegram bot.
    - `CHANNEL_ID` – ID or username of the Telegram channel (e.g. `@morningbrewdaily`).
 
+   On Windows you can set them in the command prompt before running the
+   script:
+
+   ```cmd
+   set OPENAI_API_KEY=your_openai_key
+   set TELEGRAM_TOKEN=your_bot_token
+   set CHANNEL_ID=@yourchannel
+   ```
+
 ## Usage
 
 Run the bot:
