@@ -4,6 +4,8 @@ from bs4 import BeautifulSoup
 from telegram import Bot
 from telegram.ext import Updater, JobQueue
 import openai
+import json
+import re
 
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
@@ -15,15 +17,27 @@ bot = Bot(token=TELEGRAM_TOKEN)
 
 
 def fetch_morningbrew_article():
-    """Fetches the main daily article from Morning Brew."""
+    """Fetches the latest Morning Brew newsletter as plain text."""
     url = 'https://www.morningbrew.com/daily/latest'
     response = requests.get(url, timeout=10)
     response.raise_for_status()
     soup = BeautifulSoup(response.text, 'html.parser')
-    article = soup.find('article')
-    if article:
-        return article.get_text(separator='\n')
-    return ''
+
+    script = soup.find('script', id='__NEXT_DATA__')
+    if not script or not script.string:
+        return ''
+
+    data = json.loads(script.string)
+    html_content = (
+        data.get('props', {})
+        .get('pageProps', {})
+        .get('issueData', {})
+        .get('html', '')
+    )
+    if not html_content:
+        return ''
+
+    return BeautifulSoup(html_content, 'html.parser').get_text(separator='\n')
 
 
 def summarize_and_translate(text):

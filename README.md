@@ -11,7 +11,7 @@ This bot fetches the latest article from [morningbrew.com](https://www.morningbr
 2. Set the following environment variables:
    - `OPENAI_API_KEY` – your OpenAI API key.
    - `TELEGRAM_TOKEN` – token for your Telegram bot.
-   - `CHANNEL_ID` – ID or username of the Telegram channel (e.g. `@mychannel`).
+   - `CHANNEL_ID` – ID or username of the Telegram channel (e.g. `@morningbrewdaily`).
 
 ## Usage
 
